@@ -1,0 +1,444 @@
+C51 COMPILER V9.60.0.0   I2C                                                               03/03/2020 09:08:48 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE I2C
+OBJECT MODULE PLACED IN .\Objects\i2c.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c OPTIMIZ
+                    -E(8,SPEED) BROWSE INCDIR(..\..\material\N76E003_BSP_Keil_C51_V1.0.6\N76E003_BSP_Keil_C51_V1.0.6\Include) DEFINE(FOSC_160
+                    -00) DEBUG OBJECTEXTEND PRINT(.\Listings\i2c.lst) TABS(2) OBJECT(.\Objects\i2c.obj)
+
+line level    source
+
+   1          /*********************************************************************************************************
+             -******
+   2              This file is part of Library for 8051.
+   3          
+   4              Library for 8051 is free software: you can redistribute it and/or modify
+   5              it under the terms of the GNU General Public License as published by
+   6              the Free Software Foundation, either version 3 of the License, or
+   7              (at your option) any later version.
+   8          
+   9              Library for 8051 is distributed in the hope that it will be useful,
+  10              but WITHOUT ANY WARRANTY; without even the implied warranty of
+  11              MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  12              GNU General Public License for more details.
+  13          
+  14              You should have received a copy of the GNU General Public License
+  15              along with Library for 8051.  If not, see <http://www.gnu.org/licenses/>.
+  16          /*********************************************************************************************************
+             -*****/
+  17          
+  18          
+  19          
+  20          /***
+  21          **   File       : i2c.c
+  22          **   Author     : Sriharsha
+  23          **   Website    : www.zuna.in
+  24          **   Email      : helpzuna@gmail.com
+  25          **   Description: This is the i2c driver for 8051 family MCU's
+  26          ***/
+  27          
+  28          #include "i2c.h"
+*** WARNING C318 IN LINE 43 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.h: can't open file '8051.h
+             -'
+  29          
+  30          unsigned char SlaveACK   = 0x00;
+  31          unsigned char DevAddress = 0x00;
+  32          unsigned char ClockVar   = 0x00;
+  33          
+  34          /*** Function    : _time_out_timer_0__
+  35          **   Parameters  : None
+  36          **   Return      : None
+  37          **   Description : It will give 25ms delay for I2C Detect Timeout
+  38          **/
+  39          void _time_out_timer_0__(void)
+  40          {
+  41   1      TMOD |= 0x01;
+*** ERROR C202 IN LINE 41 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'TMOD': undefined identif
+             -ier
+  42   1      TL0   = 0x00; 
+*** ERROR C202 IN LINE 42 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'TL0': undefined identifi
+             -er
+  43   1      TH0   = 0x4C; 
+*** ERROR C202 IN LINE 43 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'TH0': undefined identifi
+             -er
+C51 COMPILER V9.60.0.0   I2C                                                               03/03/2020 09:08:48 PAGE 2   
+
+  44   1      TR0   = 1;  
+*** ERROR C202 IN LINE 44 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'TR0': undefined identifi
+             -er
+  45   1      }
+  46          
+  47          /*** Function    : i2cSetPort
+  48          **   Parameters  : None
+  49          **   Return      : None
+  50          **   Description : It will set the i2c Port
+  51          **/
+  52          void  i2cSetPort(void)
+  53          {
+  54   1      SDADIR |= SDABIT;
+*** ERROR C202 IN LINE 54 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifie
+             -r
+  55   1      SCLDIR |= SCLBIT;
+*** ERROR C202 IN LINE 55 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifie
+             -r
+  56   1      SDA_HIGH;
+*** ERROR C202 IN LINE 56 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifie
+             -r
+  57   1      SCL_HIGH;
+*** ERROR C202 IN LINE 57 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifie
+             -r
+  58   1      }
+  59          
+  60          /*** Function    : i2cDelay
+  61          **   Parameters  : unsigned int
+  62          **   Return      : None
+  63          **   Description : It's delay loop for i2c Clock Generation
+  64          **/
+  65          void i2cDelay(unsigned int ClockVar)
+  66          {
+  67   1      signed char i;
+  68   1      for(i=0;i<=ClockVar;i++)
+  69   1      {
+  70   2      __asm
+  71   2      NOP
+  72   2      __endasm;
+*** ERROR C202 IN LINE 72 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'NOP': undefined identifi
+             -er
+*** ERROR C141 IN LINE 72 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: syntax error near '__enda
+             -sm', expected ';'
+  73   2      }
+  74   1      }
+  75          
+  76          /*** Function    : i2cavailable
+  77          **   Parameters  : None
+  78          **   Return      : unsigned char
+  79          **   Description : It will return's the state of i2c bus (Busy -> 0, Free -> 1)
+  80          **/
+  81          unsigned char i2cavailable(void)
+  82          {
+  83   1      return (!(SDA | SCL));
+*** ERROR C202 IN LINE 83 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifie
+             -r
+  84   1      }
+  85          
+  86          /*** Function    : i2cStart
+  87          **   Parameters  : None
+  88          **   Return      : None
+  89          **   Description : It will Starts the i2c communication
+C51 COMPILER V9.60.0.0   I2C                                                               03/03/2020 09:08:48 PAGE 3   
+
+  90          **/
+  91          void i2cStart(void)
+  92          {
+  93   1          // This Block will execute contiuous until i2c bus become free
+  94   1        back:
+  95   1        if(SDA == 0)
+*** ERROR C202 IN LINE 95 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifie
+             -r
+  96   1        goto back;
+  97   1        if(SCL == 0)
+*** ERROR C202 IN LINE 97 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifie
+             -r
+  98   1        goto back;
+  99   1        // Start communication
+ 100   1        SDA_HIGH;
+*** ERROR C202 IN LINE 100 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 101   1        SCL_HIGH;
+*** ERROR C202 IN LINE 101 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 102   1        i2cClock(ClockVar);
+ 103   1        SDA_LOW;
+*** ERROR C202 IN LINE 103 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 104   1        SCL_LOW;
+*** ERROR C202 IN LINE 104 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 105   1      }
+ 106          
+ 107          /*** Function    : i2cStartonce
+ 108          **   Parameters  : None
+ 109          **   Return      : None
+ 110          **   Description : It will start communication without checking bus state
+ 111          **/
+ 112          void i2cStartonce(void)
+ 113          {
+ 114   1        SDA_HIGH;
+*** ERROR C202 IN LINE 114 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 115   1        SCL_HIGH;
+*** ERROR C202 IN LINE 115 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 116   1        i2cClock(ClockVar);
+ 117   1        SDA_LOW;
+*** ERROR C202 IN LINE 117 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 118   1        SCL_LOW;
+*** ERROR C202 IN LINE 118 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 119   1      }
+ 120          
+ 121          /*** Function    : i2cStop
+ 122          **   Parameters  : None
+ 123          **   Return      : None
+ 124          **   Description : It will stop the i2c communication
+ 125          **/
+ 126          void i2cStop(void)
+ 127          {
+ 128   1        SDA_LOW;
+*** ERROR C202 IN LINE 128 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 129   1        SCL_HIGH;
+C51 COMPILER V9.60.0.0   I2C                                                               03/03/2020 09:08:48 PAGE 4   
+
+*** ERROR C202 IN LINE 129 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 130   1          i2cClock(ClockVar);
+ 131   1          SDA_HIGH;
+*** ERROR C202 IN LINE 131 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 132   1          SCL_LOW;
+*** ERROR C202 IN LINE 132 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 133   1      }
+ 134          
+ 135          /*** Function    : i2cWritebyte
+ 136          **   Parameters  : unsigned char (1-Byte value)
+ 137          **   Return      : None
+ 138          **   Description : It will write single byte to i2c bus
+ 139          **/
+ 140          void i2cWritebyte(unsigned char uByte)
+ 141          {
+ 142   1        unsigned char MaskByte;
+ 143   1        MaskByte = 0x80;
+ 144   1        do
+ 145   1        {
+ 146   2          if(uByte & MaskByte)
+ 147   2            SDA_HIGH;
+*** ERROR C202 IN LINE 147 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 148   2          else
+ 149   2            SDA_LOW;
+*** ERROR C202 IN LINE 149 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 150   2          SCL_HIGH;
+*** ERROR C202 IN LINE 150 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 151   2          i2cClock(ClockVar);
+ 152   2          SCL_LOW;
+*** ERROR C202 IN LINE 152 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 153   2          i2cClock(ClockVar);
+ 154   2          MaskByte /= 2;
+ 155   2        }
+ 156   1        while(MaskByte>0);
+ 157   1        SDA_HIGH;
+*** ERROR C202 IN LINE 157 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 158   1        SCL_HIGH;
+*** ERROR C202 IN LINE 158 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 159   1        i2cClock(ClockVar);
+ 160   1        SlaveACK = SDA;
+*** ERROR C202 IN LINE 160 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 161   1        SCL_LOW;
+*** ERROR C202 IN LINE 161 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 162   1      }
+ 163          
+ 164          /*** Function    : i2cReadbyte
+ 165          **   Parameters  : unsigned char (Master ACK)
+ 166          **   Return      : unsigned char (1-Byte value)
+ 167          **   Description : It will read single byte from i2c bus
+ 168          **/
+ 169          unsigned char i2cReadbyte(unsigned char MasterACK)
+C51 COMPILER V9.60.0.0   I2C                                                               03/03/2020 09:08:48 PAGE 5   
+
+ 170          {
+ 171   1        unsigned char uByte;
+ 172   1        unsigned char MaskByte;
+ 173   1        uByte    = 0;
+ 174   1        MaskByte = 0x80;
+ 175   1        do
+ 176   1        {
+ 177   2          SCL_HIGH;
+*** ERROR C202 IN LINE 177 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 178   2          if(SDA == 1)
+*** ERROR C202 IN LINE 178 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 179   2          {
+ 180   3          uByte |= MaskByte;
+ 181   3          }
+ 182   2          SCL_LOW;
+*** ERROR C202 IN LINE 182 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 183   2          MaskByte /= 2;
+ 184   2        }
+ 185   1        while(MaskByte > 0);
+ 186   1        if(MasterACK==1)
+ 187   1          SDA_HIGH;
+*** ERROR C202 IN LINE 187 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 188   1        else
+ 189   1          SDA_LOW;
+*** ERROR C202 IN LINE 189 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 190   1        SCL_LOW;
+*** ERROR C202 IN LINE 190 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 191   1        SDA_HIGH;
+*** ERROR C202 IN LINE 191 OF ..\..\material\8051-Library-master\8051-Library-master\I2C\i2c.c: 'P0': undefined identifi
+             -er
+ 192   1        return uByte;
+ 193   1      }
+ 194          
+ 195          /*** Function    : i2cWrite
+ 196          **   Parameters  : unsigned char,unsigned char (Data,Address)
+ 197          **   Return      : unsigned char (1-Byte value)
+ 198          **   Description : It will write single byte to argued address
+ 199          **/
+ 200          void i2cWrite(unsigned char Byte,unsigned char Address)
+ 201          {
+ 202   1        do
+ 203   1        {
+ 204   2          i2cStart();
+ 205   2          i2cWritebyte(DevAddress);
+ 206   2          if(SlaveACK == 1)
+ 207   2          i2cStop();
+ 208   2        }
+ 209   1        while(SlaveACK==1);
+ 210   1        i2cWritebyte(Address);
+ 211   1        i2cWritebyte(Byte);
+ 212   1        i2cStop();
+ 213   1      }
+ 214          
+ 215          /*** Function    : i2cRead
+ 216          **   Parameters  : unsigned char (Address)
+ 217          **   Return      : unsigned char (1-Byte value)
+C51 COMPILER V9.60.0.0   I2C                                                               03/03/2020 09:08:48 PAGE 6   
+
+ 218          **   Description : It will read single byte from argued address
+ 219          **/
+ 220          unsigned char i2cRead(unsigned char Address)
+ 221          {
+ 222   1        unsigned char ReadByte;
+ 223   1        do
+ 224   1        {
+ 225   2          i2cStart();
+ 226   2          i2cWritebyte(DevAddress);
+ 227   2          if(SlaveACK==1)
+ 228   2          i2cStop();
+ 229   2        }
+ 230   1        while(SlaveACK==1);
+ 231   1        i2cWritebyte(Address);
+ 232   1        i2cStop();
+ 233   1        i2cStart();
+ 234   1        i2cWritebyte(DevAddress+1);
+ 235   1        ReadByte = i2cReadbyte(1);
+ 236   1        i2cStop();
+ 237   1        return ReadByte;
+ 238   1      }
+ 239          
+ 240          /*** Function    : i2cBegin
+ 241          **   Parameters  : unsigned long (Osc Freq in Hz),unsigned long (Speed in Hz)
+ 242          **   Return      : unsigned char (1-> Device Detected,0->Device Not Detected)
+ 243          **   Description : It will read initiate the i2c communication
+ 244          **/
+ 245          unsigned char i2cBegin(unsigned long OscFreq,unsigned long Speed)
+ 246          {
+ 247   1      unsigned char teMp = 12 / ((OscFreq / 1000)/1000);
+ 248   1      teMp = teMp + CLOCK_ERROR_CORRECTION;
+ 249   1      ClockVar = teMp / Speed;
+ 250   1      }
+ 251          
+ 252          /*** Function    : i2csetAdd
+ 253          **   Parameters  : unsigned char (Device Address)
+ 254          **   Return      : None
+ 255          **   Description : It will set the device address for I2C (See global)
+ 256          **/
+ 257          void i2csetAdd(unsigned char SlaveAddress)
+ 258          {
+ 259   1      DevAddress = SlaveAddress;
+ 260   1      }
+ 261          
+ 262          /*** Function    : i2cScan
+ 263          **   Parameters  : unsigned char,unsigned char (start Address,End Address)
+ 264          **   Return      : unsigned char* (That contain Address Array and Device Count)
+ 265          **   Description : It will Scan the i2c devices connected to bus
+ 266          **/
+ 267          unsigned char* i2cScan(unsigned char startAddress,unsigned char EndAddress)
+ 268          {
+ 269   1      unsigned char i2cAddressArray[10];
+ 270   1      unsigned char DeviceCounter = 0;
+ 271   1      unsigned char temp;
+ 272   1      
+ 273   1      // Clear the buffer
+ 274   1      for(temp = 0;temp <= (EndAddress - startAddress);temp++)
+ 275   1      i2cAddressArray[temp] = 0;
+ 276   1      
+ 277   1      // Scan the devices
+ 278   1      for(temp = startAddress;temp <= EndAddress;temp++)
+ 279   1      {
+C51 COMPILER V9.60.0.0   I2C                                                               03/03/2020 09:08:48 PAGE 7   
+
+ 280   2      if(i2cBegin(temp) == 1)
+ 281   2      {
+ 282   3      DeviceCounter++;
+ 283   3      i2cAddressArray[DeviceCounter] = DeviceCounter;
+ 284   3      }
+ 285   2      }
+ 286   1      return i2cAddressArray;
+ 287   1      }
+ 288          
+ 289          /*** Function    : i2cDetect
+ 290          **   Parameters  : unsigned char (Device Address)
+ 291          **   Return      : 1 -> If detected, 0 -> If not detected
+ 292          **   Description : It will Detect the Slave 
+ 293          **/
+ 294          unsigned char i2cDetect(unsigned char _Address)
+ 295          {
+ 296   1      
+ 297   1      }
+ 298          
+ 299          /*** Function    : i2cWriteBlock
+ 300          **   Parameters  : unsigned char (Start Address),unsigned char (End Address),unsigned char* (Data)
+ 301          **   Return      : None
+ 302          **   Description : It will Write block of data into i2c bus
+ 303          **/
+ 304          void i2cWriteBlock(unsigned char sAddress,unsigned char eAddress,unsigned char *dPtr)
+ 305          {
+ 306   1      unsigned char duMmy;
+ 307   1      unsigned char i = 0;
+ 308   1      for(duMmy=sAddress;i<= eAddress;duMmy++)
+ 309   1      {
+ 310   2      i2cWrite(dPtr[i],duMmy);
+ 311   2      i++;
+ 312   2      }
+ 313   1      }
+ 314          
+ 315          /*** Function    : i2cReadBlock
+ 316          **   Parameters  : unsigned char (Start Address),unsigned char (End Address),unsigned char* (Data)
+ 317          **   Return      : None
+ 318          **   Description : It will Read block of data into i2c bus
+ 319          **/
+ 320          void i2cReadBlock(unsigned char sAddress,unsigned char eAddress,unsigned char *dPtr)
+ 321          {
+ 322   1      unsigned char duMmy;
+ 323   1      unsigned char i = 0;
+ 324   1      for(duMmy=sAddress;i<= eAddress;duMmy++)
+ 325   1      {
+ 326   2      dPtr[i] = i2cRead(duMmy);
+ 327   2      i++;
+ 328   2      }
+ 329   1      }
+ 330          
+ 331          
+ 332          
+ 333          
+ 334          
+ 335          
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  40 ERROR(S)

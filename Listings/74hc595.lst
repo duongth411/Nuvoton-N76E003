@@ -1,0 +1,74 @@
+C51 COMPILER V9.60.0.0   74HC595                                                           03/05/2020 08:42:12 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE 74HC595
+OBJECT MODULE PLACED IN .\Objects\74hc595.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE lib\74hc595.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\..\material\N76E003_BSP
+                    -_Keil_C51_V1.0.6\N76E003_BSP_Keil_C51_V1.0.6\Include;..\CBAS) DEFINE(FOSC_16000) DEBUG OBJECTEXTEND PRINT(.\Listings\74h
+                    -c595.lst) TABS(2) OBJECT(.\Objects\74hc595.obj)
+
+line level    source
+
+   1          #include "N76E003.h"
+   2          //#include "Common.h"
+   3          //#include "Delay.h"
+   4          #include "SFR_Macro.h"
+   5          #include "Function_define.h"
+   6          #include "port.h"
+   7          //#include "glbvar.h"
+   8          #include "74hc595.h"
+   9          
+  10          void fn80517segledSenddt595(unsigned char vruc80517segleddata,signed char vrc80517segselectled ){ //hien t
+             -hi len led 7 thanh
+  11   1          unsigned char i,Q;
+  12   1          switch (vrc80517segselectled){
+  13   2            case 1:
+  14   2              pnobl80517segledCtr_L1 = 1;
+  15   2              pnobl80517segledCtr_L2 = 0;
+  16   2              pnobl80517segledCtr_L3 = 0;
+  17   2              pnobl80517segledCtr_L4 = 0;
+  18   2              break;
+  19   2            case 2:
+  20   2              pnobl80517segledCtr_L1 = 0;
+  21   2              pnobl80517segledCtr_L2 = 1;
+  22   2              pnobl80517segledCtr_L3 = 0;
+  23   2              pnobl80517segledCtr_L4 = 0;
+  24   2              break;
+  25   2            case 3:
+  26   2              pnobl80517segledCtr_L1 = 0;
+  27   2              pnobl80517segledCtr_L2 = 0;
+  28   2              pnobl80517segledCtr_L3 = 1;
+  29   2              pnobl80517segledCtr_L4 = 0;
+  30   2              break;
+  31   2            case 4:
+  32   2              pnobl80517segledCtr_L1 = 0;
+  33   2              pnobl80517segledCtr_L2 = 0;
+  34   2              pnobl80517segledCtr_L3 = 0;
+  35   2              pnobl80517segledCtr_L4 = 1;
+  36   2              break;
+  37   2          }
+  38   1          Q = vruc80517segleddata;
+  39   1          for(i=0;i<8;i++){
+  40   2            pnoGlb80517segmentSDI = Q & (0x80>>i);
+  41   2            pnoGlb80517segmentCLK = 0;
+  42   2            pnoGlb80517segmentCLK = 1;
+  43   2            } 
+  44   1          pnoGlb80517segmentSTR = 0; 
+  45   1          pnoGlb80517segmentSTR = 1; //Chot hien thi du lieu
+  46   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    103    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+C51 COMPILER V9.60.0.0   74HC595                                                           03/05/2020 08:42:12 PAGE 2   
+
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

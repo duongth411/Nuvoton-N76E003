@@ -1,0 +1,598 @@
+C51 COMPILER V9.60.0.0   MAIN                                                              03/26/2020 11:45:08 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\..\material\N76E003_BSP_Keil_C
+                    -51_V1.0.6\N76E003_BSP_Keil_C51_V1.0.6\Include;..\CBAS) DEFINE(FOSC_160000) DEBUG OBJECTEXTEND PRINT(.\Listings\main.lst)
+                    - OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          /*-------------------------------------------------------------------------------------------*/
+   2          // Ten file: main.c
+   3          // Phien ban: v1, phien ban dau tien 
+   4          // Nguoi Viet: Tran Hoang Duong
+   5          // Ngay khoi dau: 27/02/2020
+   6          // Ngay ket thuc: ...
+   7          // Tinh trang: Da hoat dong
+   8          // Ghi chu: File chuong trinh chinh cua du an CBAS cho hoc vien
+   9          /*-------------------------------------------------------------------------------------------*/
+  10          
+  11          #include "main.h"
+*** WARNING C318 IN LINE 6 OF main.h: can't open file 'Common.h'
+*** WARNING C318 IN LINE 8 OF main.h: can't open file 'SFR_Macro.h'
+*** WARNING C318 IN LINE 9 OF main.h: can't open file 'Function_define.h'
+  12          
+  13          void fn8051ADCBypass (void){ 
+  14   1                      unsigned char i;
+  15   1                      for (i=0;i<0x03;i++){
+  16   2                                      
+  17   2                                      clr_ADCF;
+*** ERROR C202 IN LINE 17 OF main.c: 'clr_ADCF': undefined identifier
+  18   2                                      set_ADCS;
+*** ERROR C202 IN LINE 18 OF main.c: 'set_ADCS': undefined identifier
+  19   2                                      while(ADCF == 0);
+  20   2                      }
+  21   1      }
+  22          void fn8051I2CStart(void){
+  23   1                      SCL = 1; SCL = 0;
+  24   1                      SDA = 1; SCL = 1;
+*** ERROR C202 IN LINE 24 OF main.c: 'SDA': undefined identifier
+  25   1                      fn8051SYSDelay(1);
+  26   1                      SDA = 0; fn8051SYSDelay(1);
+*** ERROR C202 IN LINE 26 OF main.c: 'SDA': undefined identifier
+  27   1                      SCL = 0; fn8051SYSDelay(1);
+  28   1      }
+  29          void fn8051I2CStop(void){
+  30   1                      SCL = 1; SCL = 0;
+  31   1                      SDA = 0; fn8051SYSDelay(1);
+*** ERROR C202 IN LINE 31 OF main.c: 'SDA': undefined identifier
+  32   1                      SCL = 1; fn8051SYSDelay(1);
+  33   1                      SDA = 1;
+*** ERROR C202 IN LINE 33 OF main.c: 'SDA': undefined identifier
+  34   1      }
+  35          bit fn8051I2CWrite(unsigned char dat){
+  36   1                      unsigned char i;
+  37   1                      for (i=0;i<8;i++){
+  38   2                                      SDA = (dat & 0x80) ? 1:0;
+*** ERROR C202 IN LINE 38 OF main.c: 'SDA': undefined identifier
+  39   2                                      SCL=1;SCL=0;
+  40   2                                      dat<<=1;
+  41   2                              }
+  42   1                      SCL = 1; fn8051SYSDelay(1);
+  43   1                      SCL = 0;
+C51 COMPILER V9.60.0.0   MAIN                                                              03/26/2020 11:45:08 PAGE 2   
+
+  44   1                      return dat;
+  45   1      }
+  46          unsigned char fn8051I2CRead(void){
+  47   1                      bit rd_bit;
+  48   1                      unsigned char i, dat;
+  49   1                      dat = 0x00;
+  50   1                      for(i=0;i<8;i++)                                                                                /* For loop read data 1 byte */
+  51   1                      {
+  52   2                                      fn8051SYSDelay(1);
+  53   2                                      SCL = 1; fn8051SYSDelay(1);                             /* Set SCL */
+  54   2                                      rd_bit = SDA;                                                                           /* Keep for check acknowledge */
+*** ERROR C202 IN LINE 54 OF main.c: 'SDA': undefined identifier
+  55   2                                      dat = dat<<1;
+  56   2                                      dat = dat | rd_bit;                                                     /* Keep bit data in dat */
+  57   2                                      SCL = 0;                                                                                                        /* Clear SCL */
+  58   2                      }
+  59   1                      return dat;
+  60   1      }
+  61          void fn8051DS1307Out_1Hz()
+  62          {
+  63   1              fn8051I2CStart(); /* Start i2c bus */
+  64   1              fn8051I2CWrite(0xD0); /* Connect to DS1307 */
+  65   1              fn8051I2CWrite(0x07);   //vi tri con tro RTC
+  66   1              fn8051I2CWrite(0x10);
+  67   1              fn8051I2CStop();
+  68   1      }
+  69          unsigned char fn8051DS1307Readdata(unsigned char addr)
+  70          {
+  71   1                      unsigned int temp,ret;
+  72   1                      fn8051I2CStart();               /* Start i2c bus */
+  73   1                      fn8051I2CWrite(0xD0);   /* Connect to DS1307 */
+  74   1                      fn8051I2CWrite(addr);   /* Request RAM address on DS1307 */
+  75   1                      fn8051I2CStart();               /* Start i2c bus */
+  76   1                      fn8051I2CWrite(0XD1);   /* Connect to DS1307 for Read */
+  77   1                      ret = fn8051I2CRead();  /* Receive data */
+  78   1                      fn8051I2CStop();
+  79   1                      //**********************************************************
+  80   1                      temp = ret;                                                     /*BCD to HEX*/
+  81   1                      ret = (((ret/16)*10)+ (temp & 0x0f));   /*for Led 7seg*/
+  82   1                      //**********************************************************
+  83   1                      return ret;
+  84   1      }
+  85          void fn8051DS1307Writedata(unsigned char addr,unsigned char dat)
+  86          {
+  87   1                      unsigned int temp;
+  88   1                      //********************************************** 
+  89   1                      temp = dat ;                                            /*HEX to BCD*/
+  90   1                      dat = (((dat/10)*16)|(temp %10));       /*for Led 7seg*/
+  91   1                      //**********************************************
+  92   1                      fn8051I2CStart()
+  93   1              ;               /* Start i2c bus */
+  94   1                      fn8051I2CWrite(0XD0);   /* Connect to DS1307 */
+  95   1                      fn8051I2CWrite(addr);   /* Request RAM address on DS1307 */
+  96   1                      fn8051I2CWrite(dat);    /* Connect to DS1307 for Read */
+  97   1                      fn8051I2CStop();
+  98   1      }
+  99          void fn8051DS1307ReadTime()
+ 100          {
+ 101   1                      vrcGlb8051DS1307Sec  = fn8051DS1307Readdata(SEC);
+ 102   1                      vrcGlb8051DS1307Min  = fn8051DS1307Readdata(MIN);
+ 103   1                      vrcGlb8051DS1307Hour = fn8051DS1307Readdata(HOUR);
+ 104   1      }
+C51 COMPILER V9.60.0.0   MAIN                                                              03/26/2020 11:45:08 PAGE 3   
+
+ 105          void fn8051DS1307WriteTime()
+ 106          {
+ 107   1                      fn8051DS1307Writedata(SEC,vrcGlb8051DS1307Sec);
+ 108   1                      fn8051DS1307Writedata(MIN,vrcGlb8051DS1307Min);
+ 109   1                      fn8051DS1307Writedata(HOUR,vrcGlb8051DS1307Hour);
+ 110   1      }
+ 111          int main (){
+ 112   1                      Set_All_GPIO_Quasi_Mode;
+*** ERROR C202 IN LINE 112 OF main.c: 'Set_All_GPIO_Quasi_Mode': undefined identifier
+ 113   1                      fn8051ITRRegSettup();
+ 114   1                      fn8051DS1307Out_1Hz();
+ 115   1                      //fn8051ADCBypass();
+ 116   1                      do{
+ 117   2                                      fn80517segledSenddt595(0x92,1,0);
+ 118   2                                      fn8051SYSDelay(5);
+ 119   2                                      fn80517segledSenddt595(0x06,2,0);
+ 120   2                                      fn8051SYSDelay(5);
+ 121   2                                      fn80517segledSenddt595(0xc7,3,0);
+ 122   2                                      fn8051SYSDelay(5);
+ 123   2                                      fn80517segledSenddt595(0x06,4,0);
+ 124   2                                      fn8051SYSDelay(5);
+ 125   2                                      }while(pni8051ButtonSeclect!=0);
+ 126   1                                      fn8051SYSModeselect();
+ 127   1                      while(1){
+ 128   2                                      if(vrucGlb8051SYSChangemode == 0){
+ 129   3                                                      while(vrucGlb8051SYSCurrentmode==1&&vrucGlb8051SYSChangemode==0){
+ 130   4                                                                      fn80517segledFloatdisplay(vrfGlb8051ADCVadcP05);
+ 131   4                                                                      if((pni8051ButtonSeclect)==0&(pni8051ButtonDown==0)) {
+ 132   5                                                                                      vrucGlb8051SYSChangemode = 1;   
+ 133   5                                                                              }
+ 134   4      
+ 135   4                                              }
+ 136   3                                      while((vrucGlb8051SYSCurrentmode==2)&(vrucGlb8051SYSChangemode==0)){
+ 137   4                                                                      ET1 = 1;
+ 138   4                                                                      fn8051DS1307ReadTime();
+ 139   4                                                                      if((pni8051ButtonSeclect)==0&(pni8051ButtonDown==0)) {
+ 140   5                                                                                      vrucGlb8051SYSChangemode = 1;
+ 141   5                                                                                      ET1 = 0;
+ 142   5                                                                                              }
+ 143   4                                                                      if((pni8051ButtonSeclect)==0&(pni8051ButtonUp==0)) {
+ 144   5                                                                                      fn8051SYSDelay(500);
+ 145   5                                                                                      if((pni8051ButtonSeclect)==0&(pni8051ButtonUp==0)){
+ 146   6                                                                                                      fn8051DS1307timesetup();
+ 147   6                                                                                                              }
+ 148   5                                                                                              }
+ 149   4                                                                      if(pni8051ButtonSeclect ==0){
+ 150   5                                                                                      fn8051SYSDelay(2000);
+ 151   5                                                                                      if(pni8051ButtonSeclect ==0){
+ 152   6                                                                                                      fn8051APROMwriteTime();
+ 153   6                                                                                                              }
+ 154   5                                                                                      }       
+ 155   4                                                              }
+ 156   3                                      while(vrucGlb8051SYSCurrentmode==3&&vrucGlb8051SYSChangemode==0){
+ 157   4                                                      fn8051APROMReadandDisplay();
+ 158   4                                                                      if((pni8051ButtonSeclect==0)&(pni8051ButtonDown==0)) {
+ 159   5                                                                                      vrucGlb8051SYSChangemode = 1;   
+ 160   5                                                                              }
+ 161   4                                                                      if(pni8051ButtonSeclect ==0){
+ 162   5                                                                                      fn8051SYSDelay(2000);
+ 163   5                                                                                      if(pni8051ButtonSeclect ==0){
+ 164   6                                                                                                      fn8051APROMWriteADC();
+ 165   6                                                                                                              }
+C51 COMPILER V9.60.0.0   MAIN                                                              03/26/2020 11:45:08 PAGE 4   
+
+ 166   5                                                                                      }       
+ 167   4                                                              }
+ 168   3                                      }
+ 169   2                                      else{
+ 170   3                                                      while(vrucGlb8051SYSChangemode == 1){
+ 171   4                                                                              fn8051SYSModeselect();
+ 172   4                                                                              }
+ 173   3                                              }
+ 174   2                              }
+ 175   1      }       
+ 176          void fn8051ITRRegSettup (){
+ 177   1                      TMOD = 0x11;
+ 178   1                      TH0 = 0xC1;
+ 179   1                      TL0 = 0x80;
+ 180   1                      TH1 = 0xE0;
+ 181   1                      TL1 = 0xC0;
+ 182   1                      set_T0M;
+*** ERROR C202 IN LINE 182 OF main.c: 'set_T0M': undefined identifier
+ 183   1                      ET0 = 1;
+ 184   1                      EA  = 1;
+ 185   1                      TR0 = 1;
+ 186   1                      TF0 = 0; 
+ 187   1                      TF1 = 0;
+ 188   1                      TR1 = 1;
+ 189   1      }
+ 190          void  fn8051ITRVector1(void) interrupt 1{ //timer 1ms
+ 191   1                      unsigned int vri8051LedblinkCount ;
+ 192   1                      unsigned int vruc8051ADCAdctimer1 ;
+ 193   1                vri8051LedblinkCount++;
+ 194   1                      if(vri8051LedblinkCount >1000){ //timer 1 s
+ 195   2                      pnobl8051ledalert = ~pnobl8051ledalert;
+ 196   2                      vri8051LedblinkCount = 0;
+ 197   2                      }
+ 198   1                      if(vrucGlb8051SYSCurrentmode == 1){
+ 199   2                                      if(ADCS == 1) {vruc8051ADCAdctimer1 = 0;}
+ 200   2                                      else{
+ 201   3                                      vruc8051ADCAdctimer1++;
+ 202   3                                      if(vruc8051ADCAdctimer1 > 100) {
+ 203   4                                                      fn8051ADCAdcmain();
+ 204   4                                                      vruc8051ADCAdctimer1=0;
+ 205   4                                                      }
+ 206   3                              }
+ 207   2                      }
+ 208   1                      //TF0 = 0;
+ 209   1                      TH0 = 0xC1;
+ 210   1                      TL0 = 0x80;
+ 211   1      }
+ 212          void  fn8051ITRVector3(void) interrupt 3{ //timer 0,5ms
+ 213   1                      unsigned char vruc8051DS1307indexcounter;
+ 214   1                              signed char hour1,hour2,min3,min4;
+ 215   1                      vruc8051DS1307indexcounter++;
+ 216   1                      if(vruc8051DS1307indexcounter>1){
+ 217   2                                      vrucGlb8051DS1307Led_ctrlindex--;
+ 218   2                                      vruc8051DS1307indexcounter = 0;
+ 219   2                                      if(vrucGlb8051DS1307Led_ctrlindex<1){vrucGlb8051DS1307Led_ctrlindex = 4;}
+ 220   2                              }
+ 221   1                      if(vrcGlb8051DS1307Hour<10){
+ 222   2                                      hour1 = 0;
+ 223   2                                      hour2 = vrcGlb8051DS1307Hour;
+ 224   2                                                      }
+ 225   1                      else{
+ 226   2                                      hour1 = vrcGlb8051DS1307Hour/10;
+C51 COMPILER V9.60.0.0   MAIN                                                              03/26/2020 11:45:08 PAGE 5   
+
+ 227   2                                      hour2 = vrcGlb8051DS1307Hour-(hour1*10);                        
+ 228   2                                                      }
+ 229   1                      if(vrcGlb8051DS1307Min<10){
+ 230   2                                      min4 = vrcGlb8051DS1307Min ;
+ 231   2                                      min3 = 0;
+ 232   2                                                      }
+ 233   1                      else{
+ 234   2                                      min3 = vrcGlb8051DS1307Min/10;
+ 235   2                                      min4 = vrcGlb8051DS1307Min-(min3*10);                     
+ 236   2                                                      }       
+ 237   1                      if (vrucGlb8051DS1307Led_ctrlindex ==1){
+ 238   2                                      fn80517segledSenddt595(vraGlb80517segledcharacter[hour1],vrucGlb8051DS1307Led_ctrlindex,0);
+ 239   2                                              }
+ 240   1                      if (vrucGlb8051DS1307Led_ctrlindex ==2){
+ 241   2                                      fn80517segledSenddt595(vraGlb80517segledcharacter[hour2],vrucGlb8051DS1307Led_ctrlindex,1);
+ 242   2                                              }
+ 243   1                      if (vrucGlb8051DS1307Led_ctrlindex ==3){
+ 244   2                                      fn80517segledSenddt595(vraGlb80517segledcharacter[min3],vrucGlb8051DS1307Led_ctrlindex,0);
+ 245   2                                              }
+ 246   1                      if (vrucGlb8051DS1307Led_ctrlindex ==4){
+ 247   2                                      fn80517segledSenddt595(vraGlb80517segledcharacter[min4],vrucGlb8051DS1307Led_ctrlindex,1);
+ 248   2                                              }       
+ 249   1                      TH1 = 0xF9;
+ 250   1                      TL1 = 0xC0;
+ 251   1      }
+ 252          void fn8051SYSDelay(signed int time){//delay 1ms
+ 253   1                      signed int t,c;
+ 254   1                      for(c=0;c<time;c++){ 
+ 255   2                               for(t=0;t<1600;t++){         
+ 256   3                                                      }
+ 257   2                              }
+ 258   1      }               
+ 259          signed char fn8051ButtonBTread(){
+ 260   1                      if (pni8051ButtonDown==0){
+ 261   2                                      fn8051SYSDelay(100);
+ 262   2                                      return -1;
+ 263   2                                      }
+ 264   1                      if (pni8051ButtonUp==0){
+ 265   2                                      fn8051SYSDelay(100);
+ 266   2                                      return 1;
+ 267   2                                      }                                                               
+ 268   1                      else return 0;
+ 269   1      }
+ 270          void fn8051SYSModeselect(){
+ 271   1                      fn8051SYSDelay(200);
+ 272   1                      while(pni8051ButtonSeclect!=0){
+ 273   2                                      vrucGlb8051SYSCurrentmode += fn8051ButtonBTread();
+ 274   2                                      if (vrucGlb8051SYSCurrentmode>3) {vrucGlb8051SYSCurrentmode = 1;}
+ 275   2                                      if (vrucGlb8051SYSCurrentmode<1) {vrucGlb8051SYSCurrentmode = 3;}
+ 276   2                                      fn80517segledSenddt595(vraGlb80517segledcharacter[0],3,1);
+ 277   2                                      fn8051SYSDelay(5);
+ 278   2                                      fn80517segledSenddt595(vraGlb80517segledcharacter[vrucGlb8051SYSCurrentmode],4,0);
+ 279   2                                      fn8051SYSDelay(5);
+ 280   2                                      }
+ 281   1                      vrucGlb8051SYSChangemode = 0;
+ 282   1      }
+ 283          void fn80517segledSenddt595(unsigned char vruc80517segleddata,signed char vrc80517segselectled, char dotpo
+             -int ){ //hien thi len led 7 thanh
+ 284   1                      unsigned char i,Q;
+ 285   1                      Q = vruc80517segleddata;
+ 286   1                      for(i=0;i<8;i++){
+ 287   2                                      if((dotpoint==1)&(i==0)){pnoGlb80517segmentSDI=0;}
+C51 COMPILER V9.60.0.0   MAIN                                                              03/26/2020 11:45:08 PAGE 6   
+
+ 288   2                                      else
+ 289   2                                      pnoGlb80517segmentSDI = Q & (0x80>>i);
+ 290   2                                      pnoGlb80517segmentCLK = 0;
+ 291   2                                      pnoGlb80517segmentCLK = 1;
+ 292   2                              } 
+ 293   1          pnoGlb80517segmentSTR = 0; 
+ 294   1                      pnoGlb80517segmentSTR = 1;
+ 295   1                      if(vrc80517segselectled == 1 ){                 
+ 296   2                                      pnobl80517segledCtr_L1 = 1;
+ 297   2                                      pnobl80517segledCtr_L2 = pnobl80517segledCtr_L3 = pnobl80517segledCtr_L4 = 0;
+ 298   2                      }
+ 299   1                      if(vrc80517segselectled == 2 ){
+ 300   2                                      pnobl80517segledCtr_L2 = 1;
+ 301   2                                      pnobl80517segledCtr_L1 = pnobl80517segledCtr_L3 = pnobl80517segledCtr_L4 = 0;
+ 302   2                      }
+ 303   1                      if(vrc80517segselectled == 3 ){
+ 304   2                                      pnobl80517segledCtr_L3 = 1;             
+ 305   2                                      pnobl80517segledCtr_L1 = pnobl80517segledCtr_L2 = pnobl80517segledCtr_L4 = 0;
+ 306   2                      }
+ 307   1                      if(vrc80517segselectled == 4 )  {
+ 308   2                                      pnobl80517segledCtr_L4 = 1;
+ 309   2                                      pnobl80517segledCtr_L1 = pnobl80517segledCtr_L3 = pnobl80517segledCtr_L2 = 0;
+ 310   2                      }
+ 311   1      }
+ 312          //void fn8051DS1307timedisplay() {                                      
+ 313          //}
+ 314          void fn8051DS1307timesetup(){
+ 315   1                      fn80517segledSenddt595(0xff,1,1);
+ 316   1                      vrcGlb8051DS1307Sec  = 0;
+ 317   1                      vrcGlb8051DS1307Hour = 12;
+ 318   1                      vrcGlb8051DS1307Min  = 30;
+ 319   1                      do{
+ 320   2                              vrcGlb8051DS1307Min +=fn8051ButtonBTread();
+ 321   2                              if(vrcGlb8051DS1307Min>59) { vrcGlb8051DS1307Min=0; }
+ 322   2                              if(vrcGlb8051DS1307Min==0) { vrcGlb8051DS1307Min=59; }
+ 323   2                              if(pni8051ButtonSeclect==0) {
+ 324   3                                              fn8051SYSDelay(500);
+ 325   3                                                      }
+ 326   2                                              }while(pni8051ButtonSeclect!=0);
+ 327   1                      do{
+ 328   2                              vrcGlb8051DS1307Hour+=fn8051ButtonBTread();
+ 329   2                              if(vrcGlb8051DS1307Hour==0) { vrcGlb8051DS1307Hour=23; }
+ 330   2                              if(vrcGlb8051DS1307Hour>23){ vrcGlb8051DS1307Hour=0; }
+ 331   2                              if(pni8051ButtonSeclect==0){ fn8051SYSDelay(500);  }
+ 332   2                                              }while(pni8051ButtonSeclect!=0);
+ 333   1                              fn8051DS1307WriteTime();
+ 334   1      }
+ 335          void fn8051APROMwrite(unsigned char vruc80517APROMdata,signed char vruc80517APROMaddress ){
+ 336   1                      EA = 0;
+ 337   1                      TA = 0xAA;
+ 338   1                      TA = 0x55;
+ 339   1                      CHPCON |= 0x01;
+ 340   1                      TA = 0xAA;
+ 341   1                      TA = 0x55;
+ 342   1                      IAPUEN |= 0x02; //enable LDROM update
+ 343   1                      TA = 0xAA;
+ 344   1                      TA = 0x55;
+ 345   1                      IAPTRG |= 0x01; //trig IAP GO
+ 346   1                      IAPCN = vc8051LDROMByteProgram; 
+ 347   1                      IAPAH = 0x00;
+ 348   1                      IAPAL = vruc80517APROMaddress;
+ 349   1                      IAPFD = vruc80517APROMdata;
+C51 COMPILER V9.60.0.0   MAIN                                                              03/26/2020 11:45:08 PAGE 7   
+
+ 350   1                      TA = 0xAA;
+ 351   1                      TA = 0x55;
+ 352   1                      IAPTRG |= 0x01; //trig IAP GO
+ 353   1                      TA = 0xAA; //IAPUEN is TA protected
+ 354   1                      TA = 0x55;
+ 355   1                      IAPUEN &= ~0x02; //disable LDROM update
+ 356   1                      TA = 0xAA; //CHPCON is TA protected
+ 357   1                      TA = 0x55;
+ 358   1                      CHPCON &= ~0x01;// disable IAP 
+ 359   1                      EA = 1;
+ 360   1      }
+ 361          unsigned char fn8051APROMread(signed char vruc80517APROMaddress){
+ 362   1                      unsigned char Q;
+ 363   1                      EA = 0;
+ 364   1                      TA = 0xAA;
+ 365   1                      TA = 0x55;
+ 366   1                      CHPCON |= 0x01;
+ 367   1                      TA = 0xAA;
+ 368   1                      TA = 0x55;
+ 369   1                      IAPTRG |= 0x01;
+ 370   1                      IAPCN = vc8051LDROMByteRead; 
+ 371   1                      IAPAH = 0x00;
+ 372   1                      IAPAL = vruc80517APROMaddress;
+ 373   1                      Q = IAPFD;
+ 374   1                      TA = 0xAA;
+ 375   1                      TA = 0x55;
+ 376   1                      IAPTRG |= 0x01;//write ‘1’ to IAPGO to trigger IAP process
+ 377   1                      TA = 0xAA; //IAPUEN is TA protected
+ 378   1                TA = 0x55;
+ 379   1                      IAPUEN &= ~0x02; 
+ 380   1                      TA = 0xAA; //CHPCON is TA protected
+ 381   1                      TA = 0x55;
+ 382   1                      CHPCON &= ~0x01; //IAPEN = 0, disable IAP mode
+ 383   1                      EA = 1;
+ 384   1                      return Q;
+ 385   1      }
+ 386          void fn8051APROMwriteTime(){
+ 387   1                              signed char hour1,hour2,min3,min4; 
+ 388   1                      if(vrcGlb8051DS1307Hour<10){
+ 389   2                                      hour1 = 0;
+ 390   2                                      hour2 = vrcGlb8051DS1307Hour;
+ 391   2                                                      }
+ 392   1                      else{
+ 393   2                                      hour1 = vrcGlb8051DS1307Hour/10;
+ 394   2                                      hour2 = vrcGlb8051DS1307Hour-(hour1*10);                        
+ 395   2                                                      }
+ 396   1                      if(vrcGlb8051DS1307Min<10){
+ 397   2                                      min4 = vrcGlb8051DS1307Min ;
+ 398   2                                      min3 = 0;
+ 399   2                                                      }
+ 400   1                      else{
+ 401   2                                      min3 = vrcGlb8051DS1307Min/10;
+ 402   2                                      min4 = vrcGlb8051DS1307Min-(min3*10);                     
+ 403   2                                                      }
+ 404   1                      EA = 0;
+ 405   1                      TA = 0xAA; //TA protect
+ 406   1                      TA = 0x55;
+ 407   1                      CHPCON |= 0x01; //enable IAP
+ 408   1                      TA = 0xAA;
+ 409   1                      TA = 0x55;
+ 410   1                      IAPUEN |= 0x02; //enable LDROM update
+ 411   1                      IAPCN = vc8051LDROMPageErase;
+C51 COMPILER V9.60.0.0   MAIN                                                              03/26/2020 11:45:08 PAGE 8   
+
+ 412   1                      IAPAH = 0x00;
+ 413   1                      IAPAL = 0x00;
+ 414   1                      IAPFD = 0xff;
+ 415   1                      fn8051APROMwrite(hour1,0x00);
+ 416   1                      fn8051APROMwrite(hour2,0x01);
+ 417   1                      fn8051APROMwrite(min3,0x02);
+ 418   1                      fn8051APROMwrite(min4,0x03);
+ 419   1                      EA =1 ; 
+ 420   1      }
+ 421          void fn8051APROMReadandDisplay(){
+ 422   1                      char i,vrc8051APROMNguyen,vrc8051APROMTPhan1,vrc8051APROMTPhan2;
+ 423   1                      unsigned char vrc8051APROMmode =0;
+ 424   1                      vrc8051APROMmode+=fn8051ButtonBTread();
+ 425   1                      if(vrc8051APROMmode>1) {vrc8051APROMmode = 0;}
+ 426   1                      if(vrc8051APROMmode == 0){
+ 427   2                              for(i=1;i<5;i++){
+ 428   3                                              fn80517segledSenddt595(vraGlb80517segledcharacter[fn8051APROMread(0x00+i-1)],i,0);
+ 429   3                                              fn8051SYSDelay(4);
+ 430   3                                              }
+ 431   2                                      }
+ 432   1                      if(vrc8051APROMmode == 1){
+ 433   2                              vrc8051APROMNguyen = fn8051APROMread(0x04);
+ 434   2                              vrc8051APROMTPhan1 = fn8051APROMread(0x05);
+ 435   2                              vrc8051APROMTPhan2 = fn8051APROMread(0x06);
+ 436   2                              fn80517segledSenddt595(vraGlb80517segledcharacter[vrc8051APROMNguyen],i,1);
+ 437   2                              fn8051SYSDelay(4);
+ 438   2                              fn80517segledSenddt595(vraGlb80517segledcharacter[vrc8051APROMTPhan1],i,0);
+ 439   2                              fn8051SYSDelay(4);
+ 440   2                              fn80517segledSenddt595(vraGlb80517segledcharacter[vrc8051APROMTPhan2],i,0);
+ 441   2                              fn8051SYSDelay(4);                      
+ 442   2                      }
+ 443   1                      
+ 444   1      }
+ 445          void fn80517segledFloatdisplay(float vrf80517segledFin){
+ 446   1                      float Q;
+ 447   1                      unsigned char nguyen,tphan1,tphan2;
+ 448   1                      Q = vrf80517segledFin;
+ 449   1                      nguyen = (unsigned char)(Q/1000);
+ 450   1                      tphan1 = (unsigned char)((Q - nguyen*1000)/100);
+ 451   1                      tphan2 = (unsigned char)((Q - (nguyen*1000+tphan1*100))/10);
+ 452   1                      fn80517segledSenddt595(vraGlb80517segledcharacter[nguyen],2,1);
+ 453   1                      fn8051SYSDelay(3);
+ 454   1                      fn80517segledSenddt595(vraGlb80517segledcharacter[tphan1],3,0);
+ 455   1                      fn8051SYSDelay(3);
+ 456   1                      fn80517segledSenddt595(vraGlb80517segledcharacter[tphan2],4,0);
+ 457   1                      fn8051SYSDelay(3);
+ 458   1      }
+ 459          void fn8051ADCRead_bandgap(){ //IAP read
+ 460   1                      unsigned char BandgapHigh,BandgapLow,BandgapMark;       
+ 461   1                      float Bandgap_Value,Bandgap_Voltage_Temp;
+ 462   1                      set_IAPEN;
+*** ERROR C202 IN LINE 462 OF main.c: 'set_IAPEN': undefined identifier
+ 463   1                      IAPCN = 0x04;
+ 464   1                      IAPAL = 0x0d;
+ 465   1          IAPAH = 0x00;
+ 466   1          set_IAPGO;
+*** ERROR C202 IN LINE 466 OF main.c: 'set_IAPGO': undefined identifier
+ 467   1                      BandgapLow  = IAPFD;
+ 468   1                      BandgapMark = BandgapLow&0xF0;
+ 469   1                              
+ 470   1                      if (BandgapMark==0x80)
+ 471   1                      {
+C51 COMPILER V9.60.0.0   MAIN                                                              03/26/2020 11:45:08 PAGE 9   
+
+ 472   2                                      BandgapLow = BandgapLow&0x0F;
+ 473   2                                      IAPAL = 0x0C;
+ 474   2                                      IAPAH = 0x00;
+ 475   2                                      set_IAPGO;
+*** ERROR C202 IN LINE 475 OF main.c: 'set_IAPGO': undefined identifier
+ 476   2                                      BandgapHigh = IAPFD;
+ 477   2                                      Bandgap_Value = (BandgapHigh<<4)+BandgapLow;
+ 478   2                                      Bandgap_Voltage_Temp = Bandgap_Value*3/4;
+ 479   2                      }
+ 480   1                      if (BandgapMark==0x00)
+ 481   1                      {
+ 482   2                                      BandgapLow = BandgapLow&0x0F;
+ 483   2                                      IAPAL = 0x0C;
+ 484   2                                      IAPAH = 0x00;
+ 485   2                                      set_IAPGO;
+*** ERROR C202 IN LINE 485 OF main.c: 'set_IAPGO': undefined identifier
+ 486   2                                      BandgapHigh = IAPFD;
+ 487   2                                      Bandgap_Value = (BandgapHigh<<4)+BandgapLow;
+ 488   2                                      vrfGlb8051ADCBandgap_Voltage= Bandgap_Value*3/4;
+ 489   2                      }
+ 490   1                      if (BandgapMark==0x90)
+ 491   1                      {
+ 492   2                                      IAPAL = 0x0E;
+ 493   2                                      IAPAH = 0x00;
+ 494   2                                      set_IAPGO;
+*** ERROR C202 IN LINE 494 OF main.c: 'set_IAPGO': undefined identifier
+ 495   2                                      BandgapHigh = IAPFD;
+ 496   2                                      IAPAL = 0x0F;
+ 497   2                                      IAPAH = 0x00;
+ 498   2                                      set_IAPGO;
+*** ERROR C202 IN LINE 498 OF main.c: 'set_IAPGO': undefined identifier
+ 499   2                                      BandgapLow = IAPFD;
+ 500   2                                      BandgapLow = BandgapLow&0x0F;
+ 501   2                                      Bandgap_Value = (BandgapHigh<<4)+BandgapLow;
+ 502   2                                      vrfGlb8051ADCBandgap_Voltage= Bandgap_Value*3/4;
+ 503   2                      }
+ 504   1                      clr_IAPEN;
+*** ERROR C202 IN LINE 504 OF main.c: 'clr_IAPEN': undefined identifier
+ 505   1              }
+ 506          void fn8051ADCAdcmain(){
+ 507   1                      float bandgapvalue,VDD,VAIN,ADCvalue;
+ 508   1                      //fn8051ADCBypass();
+ 509   1                      fn8051ADCRead_bandgap();
+ 510   1                      ADCCON0 = 0x08;
+ 511   1                      ADCCON1 = 0x01;
+ 512   1                      clr_ADCF;
+*** ERROR C202 IN LINE 512 OF main.c: 'clr_ADCF': undefined identifier
+ 513   1                      set_ADCS;
+*** ERROR C202 IN LINE 513 OF main.c: 'set_ADCS': undefined identifier
+ 514   1                      while(ADCF == 0){};
+ 515   1                      bandgapvalue = (ADCRH<<4) + ADCRL;
+ 516   1                      VDD = (0xFFF/bandgapvalue)*vrfGlb8051ADCBandgap_Voltage;
+ 517   1                      Disable_ADC;
+*** ERROR C202 IN LINE 517 OF main.c: 'Disable_ADC': undefined identifier
+ 518   1                      ADCCON0 = 0x04;
+ 519   1                      ADCCON1 = 0x01;
+ 520   1                      //ADCCON2 = 0x00;
+ 521   1                      //AINDIDS = 0xEF;
+ 522   1                      clr_ADCF;
+*** ERROR C202 IN LINE 522 OF main.c: 'clr_ADCF': undefined identifier
+ 523   1                      set_ADCS;
+*** ERROR C202 IN LINE 523 OF main.c: 'set_ADCS': undefined identifier
+C51 COMPILER V9.60.0.0   MAIN                                                              03/26/2020 11:45:08 PAGE 10  
+
+ 524   1                      while(ADCF == 0){};
+ 525   1                      ADCvalue = (ADCRH<<4) + ADCRL;
+ 526   1                      VAIN = (float)ADCvalue/0x1000;
+ 527   1                      vrfGlb8051ADCVadcP05 = (float)(VAIN*VDD);
+ 528   1                      Disable_ADC;
+*** ERROR C202 IN LINE 528 OF main.c: 'Disable_ADC': undefined identifier
+ 529   1      }
+ 530          void fn8051APROMWriteADC(){
+ 531   1                      float Q;
+ 532   1                      unsigned char nguyen,tphan1,tphan2;
+ 533   1                      Q = vrfGlb8051ADCVadcP05;
+ 534   1                      nguyen = (unsigned char)(Q/1000);
+ 535   1                      tphan1 = (unsigned char)((Q - nguyen*1000)/100);
+ 536   1                      tphan2 = (unsigned char)((Q - (nguyen*1000+tphan1*100))/10);
+ 537   1                      fn8051APROMwrite(nguyen,0x04);
+ 538   1                      fn8051APROMwrite(tphan1,0x05);
+ 539   1                      fn8051APROMwrite(tphan2,0x06);
+ 540   1      }
+
+C51 COMPILATION COMPLETE.  3 WARNING(S),  23 ERROR(S)

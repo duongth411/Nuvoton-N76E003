@@ -1,0 +1,6 @@
+".\Objects\main.obj",
+".\Objects\Common.obj",
+".\Objects\STARTUP.obj" 
+TO ".\Objects\prjCBAS" 
+PRINT(".\Listings\prjCBAS.m51") RAMSIZE(256) 
+DISABLEWARNING (16) 

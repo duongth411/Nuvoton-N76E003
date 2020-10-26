@@ -1,0 +1,86 @@
+C51 COMPILER V9.60.0.0   74HC595                                                           03/05/2020 09:10:41 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE 74HC595
+OBJECT MODULE PLACED IN .\Objects\74hc595.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE 74hc595.c OPTIMIZE(8,SPEED) DEBUG OBJECTEXTEND PRINT(.\Listings\74hc595.
+                    -lst) TABS(2) OBJECT(.\Objects\74hc595.obj)
+
+line level    source
+
+   1          #include "N76E003.h"
+   2          //#include "Common.h"
+   3          //#include "Delay.h"
+   4          #include "SFR_Macro.h"
+*** WARNING C318 IN LINE 4 OF 74hc595.c: can't open file 'SFR_Macro.h'
+   5          #include "Function_define.h"
+*** WARNING C318 IN LINE 5 OF 74hc595.c: can't open file 'Function_define.h'
+   6          #include "port.h"
+*** WARNING C318 IN LINE 6 OF 74hc595.c: can't open file 'port.h'
+   7          //#include "glbvar.h"
+   8          #include "..\Include\74hc595.h"
+*** WARNING C318 IN LINE 8 OF 74hc595.c: can't open file '..\Include\74hc595.h'
+   9          
+  10          void fn80517segledSenddt595(unsigned char vruc80517segleddata,signed char vrc80517segselectled ){ //hien t
+             -hi len led 7 thanh
+  11   1          unsigned char i,Q;
+  12   1          switch (vrc80517segselectled){
+  13   2            case 1:
+  14   2              pnobl80517segledCtr_L1 = 1;
+*** ERROR C202 IN LINE 14 OF 74hc595.c: 'pnobl80517segledCtr_L1': undefined identifier
+  15   2              pnobl80517segledCtr_L2 = 0;
+*** ERROR C202 IN LINE 15 OF 74hc595.c: 'pnobl80517segledCtr_L2': undefined identifier
+  16   2              pnobl80517segledCtr_L3 = 0;
+*** ERROR C202 IN LINE 16 OF 74hc595.c: 'pnobl80517segledCtr_L3': undefined identifier
+  17   2              pnobl80517segledCtr_L4 = 0;
+*** ERROR C202 IN LINE 17 OF 74hc595.c: 'pnobl80517segledCtr_L4': undefined identifier
+  18   2              break;
+  19   2            case 2:
+  20   2              pnobl80517segledCtr_L1 = 0;
+*** ERROR C202 IN LINE 20 OF 74hc595.c: 'pnobl80517segledCtr_L1': undefined identifier
+  21   2              pnobl80517segledCtr_L2 = 1;
+*** ERROR C202 IN LINE 21 OF 74hc595.c: 'pnobl80517segledCtr_L2': undefined identifier
+  22   2              pnobl80517segledCtr_L3 = 0;
+*** ERROR C202 IN LINE 22 OF 74hc595.c: 'pnobl80517segledCtr_L3': undefined identifier
+  23   2              pnobl80517segledCtr_L4 = 0;
+*** ERROR C202 IN LINE 23 OF 74hc595.c: 'pnobl80517segledCtr_L4': undefined identifier
+  24   2              break;
+  25   2            case 3:
+  26   2              pnobl80517segledCtr_L1 = 0;
+*** ERROR C202 IN LINE 26 OF 74hc595.c: 'pnobl80517segledCtr_L1': undefined identifier
+  27   2              pnobl80517segledCtr_L2 = 0;
+*** ERROR C202 IN LINE 27 OF 74hc595.c: 'pnobl80517segledCtr_L2': undefined identifier
+  28   2              pnobl80517segledCtr_L3 = 1;
+*** ERROR C202 IN LINE 28 OF 74hc595.c: 'pnobl80517segledCtr_L3': undefined identifier
+  29   2              pnobl80517segledCtr_L4 = 0;
+*** ERROR C202 IN LINE 29 OF 74hc595.c: 'pnobl80517segledCtr_L4': undefined identifier
+  30   2              break;
+  31   2            case 4:
+  32   2              pnobl80517segledCtr_L1 = 0;
+*** ERROR C202 IN LINE 32 OF 74hc595.c: 'pnobl80517segledCtr_L1': undefined identifier
+  33   2              pnobl80517segledCtr_L2 = 0;
+*** ERROR C202 IN LINE 33 OF 74hc595.c: 'pnobl80517segledCtr_L2': undefined identifier
+  34   2              pnobl80517segledCtr_L3 = 0;
+*** ERROR C202 IN LINE 34 OF 74hc595.c: 'pnobl80517segledCtr_L3': undefined identifier
+C51 COMPILER V9.60.0.0   74HC595                                                           03/05/2020 09:10:41 PAGE 2   
+
+  35   2              pnobl80517segledCtr_L4 = 1;
+*** ERROR C202 IN LINE 35 OF 74hc595.c: 'pnobl80517segledCtr_L4': undefined identifier
+  36   2              break;
+  37   2          }
+  38   1          Q = vruc80517segleddata;
+  39   1          for(i=0;i<8;i++){
+  40   2            pnoGlb80517segmentSDI = Q & (0x80>>i);
+*** ERROR C202 IN LINE 40 OF 74hc595.c: 'pnoGlb80517segmentSDI': undefined identifier
+  41   2            pnoGlb80517segmentCLK = 0;
+*** ERROR C202 IN LINE 41 OF 74hc595.c: 'pnoGlb80517segmentCLK': undefined identifier
+  42   2            pnoGlb80517segmentCLK = 1;
+*** ERROR C202 IN LINE 42 OF 74hc595.c: 'pnoGlb80517segmentCLK': undefined identifier
+  43   2            } 
+  44   1          pnoGlb80517segmentSTR = 0; 
+*** ERROR C202 IN LINE 44 OF 74hc595.c: 'pnoGlb80517segmentSTR': undefined identifier
+  45   1          pnoGlb80517segmentSTR = 1; //Chot hien thi du lieu
+*** ERROR C202 IN LINE 45 OF 74hc595.c: 'pnoGlb80517segmentSTR': undefined identifier
+  46   1      }
+
+C51 COMPILATION COMPLETE.  4 WARNING(S),  21 ERROR(S)

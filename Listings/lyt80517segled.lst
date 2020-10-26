@@ -1,0 +1,88 @@
+C51 COMPILER V9.60.0.0   LYT80517SEGLED                                                    02/27/2020 18:09:02 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE LYT80517SEGLED
+OBJECT MODULE PLACED IN .\Objects\lyt80517segled.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE lyt80517segled.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\..\material\N76E003_
+                    -BSP_Keil_C51_V1.0.6\N76E003_BSP_Keil_C51_V1.0.6\Include) DEFINE(FOSC_16000) DEBUG OBJECTEXTEND PRINT(.\Listings\lyt80517
+                    -segled.lst) TABS(2) OBJECT(.\Objects\lyt80517segled.obj)
+
+line level    source
+
+   1          /*------------------------------------------------------------------------------------------*/
+   2          // Ten file: lyt8057segled.c
+   3          // Phien ban: v1, phien ban dau tien 
+   4          // Nguoi Viet: Tran Hoang Duong
+   5          // Ngay khoi dau: 27/02/2020
+   6          // Ngay ket thuc: ...
+   7          // Tinh trang: 
+   8          // Ghi chu: File chuong trinh hien thi ra led 7 thanh cua du an CBAS cho hoc vien
+   9          /*-------------------------------------------------------------------------------------------*/
+  10          
+  11          #include "N76E003.h"
+  12          #include "Common.h"
+  13          #include "Delay.h"
+  14          #include "SFR_Macro.h"
+  15          #include "Function_define.h"
+  16          unsigned char vra1c80517segledcharacter[10]={0x00,0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80,0x00};
+  17          void fn80517segledSenddt595(unsigned char vra1c80517segledcharacter[] );
+  18          /*#define pnoGlb80517segmentCLK = P03 //Chan clock
+  19          #define pnoGlb80517segmentSDI = P04 //Chan 14data
+  20          #define pnoGlb80517segmentSTR = P02 //Chan 12 chot
+  21          #define pnobl80517segledCtr_L1 =  P14
+  22          #define pnobl80517segledCtr_L2 =  P13
+  23          #define pnobl80517segledCtr_L3 =  P12
+  24          #define pnobl80517segledCtr_L4 =  P16
+  25          */
+  26          void delay(unsigned char time){
+  27   1      //Chuong trinh tao tre 50ms
+  28   1           unsigned char t;
+  29   1           for(t=0;t<time;t++){
+  30   2              TMOD=0x01;
+  31   2              TH0=0x3c;
+  32   2              TL0=0xb0;
+  33   2              TR0=1;
+  34   2              while(!TF0);
+  35   2              TF0=TR0=0;               
+  36   2              }
+  37   1      }
+  38          
+  39          /* void main(){ 
+  40              
+  41              while(1){
+  42                P14 = 1;
+  43                P13 = 1;
+  44                P12 = 1;
+  45                P16 = 1;
+  46                fn80517segledSenddt595(&vra1c80517segledcharacter[10]);
+  47                delay(1000);
+  48                  }
+  49              
+  50          } */
+  51          void fn80517segledSenddt595(unsigned char vra1uc80517segleddata){
+*** WARNING C235 IN LINE 51 OF lyt80517segled.c: parameter 1: different types
+  52   1          unsigned char i;
+C51 COMPILER V9.60.0.0   LYT80517SEGLED                                                    02/27/2020 18:09:02 PAGE 2   
+
+  53   1          for(i=0;i<8;i++){
+  54   2            P04 = vra1uc80517segleddata & (0x80>>i);
+  55   2            P03 = 0;
+  56   2            P03 = 1;
+  57   2            } 
+  58   1           P02 = 0; 
+  59   1           P02 = 1; //Chot hien thi du lieu
+  60   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     83    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     10    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)
